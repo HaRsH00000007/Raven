@@ -1,0 +1,11 @@
+<!doctype html><html><body>
+<div id="onetrust-banner-sdk" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99">
+  <div style="background:#fff;padding:20px;margin:100px auto;width:400px">We use cookies.
+  <button onclick="document.getElementById('onetrust-banner-sdk').remove()">Accept All Cookies</button>
+  <button onclick="window.__rejected=1;document.getElementById('onetrust-banner-sdk').remove()">Reject All</button></div></div>
+<h1>Can't find what you're looking for?</h1>
+<button id="open" onclick="document.getElementById('modal').style.display='block'">Send us a message</button>
+<div id="modal" style="display:none"><form onsubmit="event.preventDefault();this.outerHTML='<p>Thanks! Your message has been sent.</p>'">
+<input name="name" placeholder="Name"><input type="email" name="email" placeholder="Email" required>
+<textarea name="message" placeholder="How can we help?" required></textarea><button type="submit">Submit</button></form></div>
+</body></html>

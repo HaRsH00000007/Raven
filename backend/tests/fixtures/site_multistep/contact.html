@@ -1,0 +1,26 @@
+<!doctype html><html><body><h1>Talk to our team</h1>
+<form id="wiz" onsubmit="event.preventDefault(); this.outerHTML='<p>Thanks! We have received your request.</p>'">
+  <fieldset class="step" data-step="1"><legend>Step 1 of 3</legend>
+    <label for="fn">First name *</label><input id="fn" name="first_name" required>
+    <label for="ln">Last name *</label><input id="ln" name="last_name" required>
+    <label for="em">Work email *</label><input id="em" type="email" name="email" required>
+    <button type="button" class="next">Next</button></fieldset>
+  <fieldset class="step" data-step="2" style="display:none"><legend>Step 2 of 3</legend>
+    <label for="co">Company *</label><input id="co" name="company" required>
+    <label for="sz">Company size *</label><select id="sz" name="size" required><option value="">Choose</option><option>1-10</option><option>11-50</option></select>
+    <button type="button" class="prev">Back</button><button type="button" class="next">Continue</button></fieldset>
+  <fieldset class="step" data-step="3" style="display:none"><legend>Step 3 of 3</legend>
+    <label for="msg">How can we help? *</label><textarea id="msg" name="message" required></textarea>
+    <button type="button" class="prev">Back</button><button type="submit">Submit request</button></fieldset>
+</form>
+<script>
+const steps = [...document.querySelectorAll('.step')];
+let cur = 0;
+const show = i => steps.forEach((s, j) => s.style.display = j === i ? 'block' : 'none');
+document.querySelectorAll('.next').forEach(b => b.addEventListener('click', () => {
+  const bad = [...steps[cur].querySelectorAll('input,select,textarea')].some(el => !el.checkValidity());
+  if (bad) return;  // stay on the step, like real wizards
+  setTimeout(() => show(++cur), 150);
+}));
+document.querySelectorAll('.prev').forEach(b => b.addEventListener('click', () => show(--cur)));
+</script></body></html>

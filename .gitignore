@@ -1,0 +1,27 @@
+# Secrets / local config
+.env
+*.env.local
+.env.local
+backend/.env
+frontend/.env.local
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Runtime data and local benchmark output
+backend/data/
+benchmark_results.json
+benchmark_run.log
+benchmark_screenshots/
+*.log
+
+# Private business documents (never publish)
+*.pdf

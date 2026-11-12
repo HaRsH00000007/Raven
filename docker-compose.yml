@@ -1,0 +1,94 @@
+name: raven
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+asyncpg://raven:raven@postgres:5432/raven
+  REDIS_URL: redis://redis:6379/0
+  ENVIRONMENT: ${ENVIRONMENT:-development}
+  ADMIN_TOKEN: ${ADMIN_TOKEN:-change-me-admin}
+  DEV_BOOTSTRAP_API_KEY: ${RAVEN_API_KEY:-rvn_dev_local_key_change_me}
+  DEV_BOOTSTRAP_CREDITS: ${DEV_BOOTSTRAP_CREDITS:-5000}
+  REPLY_DOMAIN: ${REPLY_DOMAIN:-replies.example.com}
+  INBOUND_WEBHOOK_TOKEN: ${INBOUND_WEBHOOK_TOKEN:-change-me-webhook}
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8000}
+  TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_USERNAME: ${SMTP_USERNAME:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  SMTP_FROM: ${SMTP_FROM:-Raven <notifications@example.com>}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  LLM_MODEL: ${LLM_MODEL:-claude-opus-5-5}
+  CREDIT_VALIDITY_DAYS: ${CREDIT_VALIDITY_DAYS:-60}
+  DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+  ALLOW_SIMULATOR: ${ALLOW_SIMULATOR:-false}
+  WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-8}
+  BILL_UNVERIFIED: ${BILL_UNVERIFIED:-false}
+  BOT_INFO_URL: ${BOT_INFO_URL:-https://example.com/bot}
+  CORS_ORIGINS: '["http://localhost:3000"]'
+  SCREENSHOT_DIR: /data/screenshots
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: raven
+      POSTGRES_PASSWORD: raven
+      POSTGRES_DB: raven
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raven"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    image: raven-backend:local
+    environment: *backend-env
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - screenshots:/data/screenshots
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  worker:
+    image: raven-backend:local  # same image as backend, different command
+    command: ["arq", "app.workers.arq_worker.WorkerSettings"]
+    environment: *backend-env
+    volumes:
+      - screenshots:/data/screenshots
+    shm_size: "1gb"  # Chromium needs more than Docker's 64 MB default
+    depends_on:
+      backend: { condition: service_healthy }  # backend runs the migrations
+
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8000
+      RAVEN_API_KEY: ${RAVEN_API_KEY:-rvn_dev_local_key_change_me}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  screenshots:

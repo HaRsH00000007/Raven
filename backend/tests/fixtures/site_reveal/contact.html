@@ -1,0 +1,7 @@
+<!doctype html><html><body><form id="f" onsubmit="event.preventDefault(); if(!document.getElementById('other').value){document.getElementById('err').textContent='This field is required.';return;} this.outerHTML='<p>Thank you! Your message has been sent.</p>'">
+<label for="e">Email *</label><input id="e" type="email" name="email" required>
+<label for="s">Subject *</label><select id="s" name="subject" required onchange="document.getElementById('ow').style.display=this.value==='other'?'block':'none'">
+<option value="">Select</option><option value="support">Product support</option><option value="other">Other</option></select>
+<div id="ow" style="display:none"><label for="other">Subject (Other)*</label><input id="other" name="subject_other"></div>
+<label for="m">Message *</label><textarea id="m" name="message" required></textarea><span id="err"></span>
+<button type="submit">Send</button></form></body></html>

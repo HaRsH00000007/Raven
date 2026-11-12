@@ -1,0 +1,18 @@
+<!doctype html><html><head><title>Contact</title></head><body>
+<h1>Get in touch</h1>
+<form id="contact" action="/submit" onsubmit="event.preventDefault(); fetch('/submit.json',{method:'POST'}).then(()=>{document.getElementById('contact').style.display='none';document.getElementById('ok').style.display='block';});">
+  <label for="fn">First name *</label><input id="fn" name="first_name" required>
+  <label for="ln">Last name</label><input id="ln" name="last_name">
+  <label for="em">Email *</label><input id="em" type="email" name="email" required>
+  <label for="ph">Phone</label><input id="ph" type="tel" name="phone">
+  <label for="co">Company</label><input id="co" name="company">
+  <label for="topic">Topic</label><select id="topic" name="topic" required><option value="">-- Select --</option><option value="support">Support</option><option value="general">General inquiry</option></select>
+  <div style="position:absolute;left:-9999px"><input name="website_hp" tabindex="-1" autocomplete="off"></div>
+  <input name="trap" style="display:none">
+  <label for="msg">How can we help?</label><textarea id="msg" name="message" required></textarea>
+  <label><input type="checkbox" name="consent" required> I agree to the privacy policy</label>
+  <label><input type="checkbox" name="news"> Subscribe to our newsletter</label>
+  <button type="submit">Send message</button>
+</form>
+<div id="ok" style="display:none">Thank you! Your message has been sent.</div>
+</body></html>
